@@ -1,0 +1,102 @@
+package com.example.tests;
+import com.example.base.BaseTest;
+import com.example.pages.*;
+import com.example.reporting.ExtentReportManager;
+import com.example.reporting.TestListener;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
+
+@Listeners(TestListener.class)
+
+public class CheckoutPageTest extends BaseTest {
+    CheckoutPage checkoutPage = new CheckoutPage(driver);
+
+
+    @BeforeMethod
+    public void setup() {
+        super.setup();
+        checkoutPage = new CheckoutPage(driver);
+    }
+
+    @Test
+    public void testCheckout() throws InterruptedException {
+        String timestamp = Long.toString(System.currentTimeMillis());
+        String emailadd = "john.doe+" + timestamp + "@example.com";
+        CartPage cartPage = new CartPage(driver);
+        HomePage homePage = new HomePage(driver);
+        homePage.clickRegister();
+        RegisterPage registerPage = new RegisterPage(driver);
+        registerPage.registerUser("John", "Doe", emailadd, "password123");
+        // Add a screenshot after registration
+        ExtentReportManager.addScreenshot(driver, "Registration Screenshot");
+        registerPage.logout();
+        homePage.clickLogin();
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.loginUser(emailadd, "password123");
+        ExtentReportManager.addScreenshot(driver, "Login Screenshot");
+
+        homePage.clickComputers();
+
+        ExtentReportManager.addScreenshot(driver, "Computers Page");
+
+        ComputersPage computersPage = new ComputersPage(driver);
+        computersPage.clickDesktops();
+
+        ExtentReportManager.addScreenshot(driver, "Desktops");
+
+        cartPage.addDesktopToCart();
+
+        ExtentReportManager.addScreenshot(driver, "Add To Cart");
+
+        String totalPrice = cartPage.getTotalPrice();
+
+        ExtentReportManager.addScreenshot(driver, "Get Total Price");
+
+        System.out.println("Total Price " + totalPrice);
+
+        ExtentReportManager.getTest().info("Total Price " + totalPrice);
+
+        cartPage.removeItemFromCart();
+
+        ExtentReportManager.addScreenshot(driver, "Remove From Cart");
+
+        String updatedTotalPrice = cartPage.getTotalPrice();
+
+        ExtentReportManager.addScreenshot(driver, "Get Updated Total Price");
+
+        System.out.println("Total Price " + updatedTotalPrice);
+
+        ExtentReportManager.getTest().info("Total Price " + updatedTotalPrice);
+        checkoutPage.checkout();
+
+        ExtentReportManager.addScreenshot(driver, "Checkout");
+
+        checkoutPage.fillCheckoutForm("East ", "236547654","7784","00087564");
+
+        ExtentReportManager.addScreenshot(driver, "Fill Checkout Form");
+
+        checkoutPage.completeTransaction();
+
+        ExtentReportManager.addScreenshot(driver, "Complete Checkout");
+
+        // Add a screenshot after registration
+        ExtentReportManager.addScreenshot(driver, "completed Transaction");
+
+
+
+    }
+
+    @Test
+    public void testFillCheckoutForm() {
+        checkoutPage.fillCheckoutForm("Cape Town", "236547654v","7784","00087564");
+
+    }
+
+    @Test
+    public void testCompleteTransaction() {
+        checkoutPage.completeTransaction();
+
+    }
+}
